@@ -613,6 +613,68 @@ a {
     box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
+/* Clients Carousel */
+.clients-section {
+    padding: var(--spacing-lg) 0;
+    border-top: 1px solid var(--border-color);
+}
+
+.clients-carousel {
+    overflow: hidden;
+    margin-top: 3rem;
+    padding: 2rem 0;
+    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+}
+
+.clients-track {
+    display: flex;
+    align-items: center;
+    gap: 3rem;
+    width: max-content;
+    animation: scrollLogos 20s linear infinite;
+}
+
+.clients-track img {
+    width: 150px;
+    height: 80px;
+    object-fit: contain;
+    object-position: center;
+    filter: grayscale(100%) brightness(1.2) contrast(1.1);
+    opacity: 0.85;
+    transition: all 0.4s ease;
+    flex-shrink: 0;
+}
+
+.clients-track img.logo-alcaldia {
+    width: 120px;
+    height: 60px;
+}
+
+.clients-track img.logo-jc {
+    width: 150px;
+    height: 130px;
+}
+
+.clients-track img.logo-inducarbones {
+    width: 180px;
+    height: 100px;
+}
+
+.clients-track img:hover {
+    filter: grayscale(0%) brightness(1);
+    opacity: 1;
+}
+
+@keyframes scrollLogos {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-50%);
+    }
+}
+
 /* CTA Section */
 .cta-section {
     padding: var(--spacing-xl) 0;
@@ -674,8 +736,16 @@ a {
     gap: 1.5rem;
 }
 
+.footer-links a {
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
 .footer-links a:hover {
     color: var(--accent-primary);
+    transform: translateY(-3px);
 }
 
 .footer-bottom {
@@ -745,30 +815,39 @@ a {
     .nav {
         display: none;
     }
-    
+
     .logo {
         font-size: 1.3rem;
     }
-    
+
     .bento-grid, .cert-grid {
         grid-template-columns: 1fr;
     }
-    
+
     .bento-card.col-span-2 {
         grid-column: span 1;
     }
-    
+
     .hero h1 {
         font-size: 2.8rem;
     }
-    
+
     .diff-box {
         padding: 2rem;
         grid-template-columns: 1fr;
         gap: 2rem;
     }
-    
+
     .cta-title {
         font-size: 2.2rem;
+    }
+
+    .clients-track img {
+        height: 45px;
+        width: 120px;
+    }
+
+    .clients-track {
+        gap: 3rem;
     }
 }
