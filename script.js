@@ -195,15 +195,15 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =============================================
-    // 8. CANVAS PARTICLES (Hero)
+    // 8. CANVAS PARTICLES (Full Page, Fixed)
     // =============================================
     const canvas = document.getElementById('particles-canvas');
     if (canvas) {
         const ctx = canvas.getContext('2d');
 
         function resizeCanvas() {
-            canvas.width  = canvas.offsetWidth;
-            canvas.height = canvas.offsetHeight;
+            canvas.width  = window.innerWidth;
+            canvas.height = window.innerHeight;
         }
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas, { passive: true });
@@ -284,6 +284,38 @@ document.addEventListener('DOMContentLoaded', () => {
             glow1.style.transform = `translate(${mx * 35}px, ${my * 25}px)`;
             glow2.style.transform = `translate(${-mx * 25}px, ${-my * 18}px)`;
         });
+    }
+
+    // =============================================
+    // 11. ANIMATED COUNTERS
+    // =============================================
+    const counters = document.querySelectorAll('.counter');
+    if (counters.length > 0) {
+        const counterObserver = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (!entry.isIntersecting) return;
+                const el     = entry.target;
+                const target = parseInt(el.dataset.target, 10);
+                const duration = 1800;
+                const start    = performance.now();
+
+                function update(now) {
+                    const progress = Math.min((now - start) / duration, 1);
+                    // Ease out cubic
+                    const eased = 1 - Math.pow(1 - progress, 3);
+                    el.textContent = Math.floor(eased * target);
+                    if (progress < 1) {
+                        requestAnimationFrame(update);
+                    } else {
+                        el.textContent = target;
+                    }
+                }
+                requestAnimationFrame(update);
+                observer.unobserve(el);
+            });
+        }, { threshold: 0.5 });
+
+        counters.forEach(c => counterObserver.observe(c));
     }
 
     setTimeout(() => { document.body.style.opacity = '1'; }, 100);
