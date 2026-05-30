@@ -39,7 +39,6 @@ document.addEventListener('DOMContentLoaded', () => {
             entry.target.classList.add('revealed');
             obs.unobserve(entry.target);
             // Init constellation after tags finish their pop-in animation
-            setTimeout(initConstellation, 1300);
         });
     }, { threshold: 0.2 });
 
@@ -275,27 +274,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // =============================================
-    // 9b. HOLOGRAPHIC EFFECT on Profile Photo
-    // =============================================
-    const imgWrapper = document.querySelector('.image-wrapper');
-    if (imgWrapper) {
-        imgWrapper.addEventListener('mousemove', e => {
-            const rect = imgWrapper.getBoundingClientRect();
-            const mx = (e.clientX - rect.left) / rect.width;
-            const my = (e.clientY - rect.top)  / rect.height;
-            imgWrapper.style.setProperty('--mx', mx);
-            imgWrapper.style.setProperty('--my', my);
-            imgWrapper.style.setProperty('--shine', 1);
-            imgWrapper.style.transform = `perspective(600px) rotateX(${-(my - 0.5) * 10}deg) rotateY(${(mx - 0.5) * 10}deg) scale(1.03)`;
-        });
-        imgWrapper.addEventListener('mouseleave', () => {
-            imgWrapper.style.setProperty('--shine', 0);
-            imgWrapper.style.transition = 'transform 0.6s ease';
-            imgWrapper.style.transform = '';
-            setTimeout(() => { imgWrapper.style.transition = ''; }, 650);
-        });
-    }
 
     // =============================================
     // 10. NAV LOGO GLITCH
@@ -314,135 +292,6 @@ document.addEventListener('DOMContentLoaded', () => {
         })();
     }
 
-    // =============================================
-    // CONSTELLATION of SKILLS
-    // =============================================
-    function initConstellation() {
-        const wrapper = document.getElementById('constellation-wrapper');
-        const canvas  = document.getElementById('constellation-canvas');
-        if (!wrapper || !canvas || canvas.dataset.init) return;
-        canvas.dataset.init = '1';
-
-        const ctx  = canvas.getContext('2d');
-        const tags = Array.from(document.querySelectorAll('.tag-cloud .tag'));
-        let positions = [];
-        let mouseX = -999, mouseY = -999;
-        let hoveredIdx = -1;
-
-        function setupCanvas() {
-            canvas.width  = wrapper.offsetWidth  + 48;
-            canvas.height = wrapper.offsetHeight + 48;
-        }
-        setupCanvas();
-
-        function updatePositions() {
-            const wRect = wrapper.getBoundingClientRect();
-            positions = tags.map(tag => {
-                const r = tag.getBoundingClientRect();
-                return {
-                    x: r.left + r.width  / 2 - wRect.left + 24,
-                    y: r.top  + r.height / 2 - wRect.top  + 24
-                };
-            });
-        }
-        updatePositions();
-
-        window.addEventListener('resize', () => { setupCanvas(); updatePositions(); });
-
-        wrapper.addEventListener('mousemove', e => {
-            const r = wrapper.getBoundingClientRect();
-            mouseX = e.clientX - r.left + 24;
-            mouseY = e.clientY - r.top  + 24;
-        });
-        wrapper.addEventListener('mouseleave', () => {
-            mouseX = -999; mouseY = -999;
-            tags.forEach(t => { t.style.borderColor = ''; t.style.boxShadow = ''; t.style.color = ''; });
-        });
-
-        tags.forEach((tag, i) => {
-            tag.addEventListener('mouseenter', () => { hoveredIdx = i; });
-            tag.addEventListener('mouseleave', () => {
-                hoveredIdx = -1;
-                tag.style.borderColor = '';
-                tag.style.boxShadow   = '';
-                tag.style.color       = '';
-            });
-        });
-
-        const MAX_DIST = 175;
-        let t = 0;
-
-        (function draw() {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-            t += 0.007;
-
-            // Mouse proximity glow on nearby tags
-            if (mouseX > 0 && positions.length) {
-                positions.forEach((pos, i) => {
-                    const d = Math.hypot(pos.x - mouseX, pos.y - mouseY);
-                    if (d < 95) {
-                        const s = 1 - d / 95;
-                        tags[i].style.borderColor = `rgba(0,240,255,${0.35 + s * 0.55})`;
-                        tags[i].style.boxShadow   = `0 0 ${14 * s}px rgba(0,240,255,${0.28 * s}), inset 0 0 ${7 * s}px rgba(0,240,255,${0.1 * s})`;
-                        tags[i].style.color       = `rgba(255,255,255,${0.75 + s * 0.25})`;
-                    } else if (hoveredIdx !== i) {
-                        tags[i].style.borderColor = '';
-                        tags[i].style.boxShadow   = '';
-                        tags[i].style.color       = '';
-                    }
-                });
-            }
-
-            // Connection lines between nearby tags
-            for (let i = 0; i < positions.length; i++) {
-                for (let j = i + 1; j < positions.length; j++) {
-                    const a = positions[i], b = positions[j];
-                    const dist = Math.hypot(a.x - b.x, a.y - b.y);
-                    if (dist >= MAX_DIST) continue;
-
-                    const active = hoveredIdx === i || hoveredIdx === j;
-                    const pulse  = (Math.sin(t + i * 0.55 + j * 0.3) + 1) / 2;
-                    const alpha  = active ? 0.55 : (1 - dist / MAX_DIST) * 0.11 + pulse * 0.03;
-
-                    ctx.beginPath();
-                    ctx.moveTo(a.x, a.y);
-                    ctx.lineTo(b.x, b.y);
-                    ctx.strokeStyle = active
-                        ? `rgba(0,240,255,${alpha})`
-                        : `rgba(125,226,209,${alpha})`;
-                    ctx.lineWidth = active ? 1.2 : 0.5;
-                    ctx.stroke();
-                }
-            }
-
-            // Node dots
-            positions.forEach((pos, i) => {
-                const active = hoveredIdx === i;
-                const pulse  = (Math.sin(t + i * 0.85) + 1) / 2;
-                const r      = active ? 5 : 1.8 + pulse * 0.7;
-                const alpha  = active ? 1  : 0.32 + pulse * 0.28;
-
-                if (active) {
-                    ctx.beginPath();
-                    ctx.arc(pos.x, pos.y, r + 7, 0, Math.PI * 2);
-                    ctx.fillStyle = 'rgba(0,240,255,0.07)';
-                    ctx.fill();
-                    ctx.beginPath();
-                    ctx.arc(pos.x, pos.y, r + 3, 0, Math.PI * 2);
-                    ctx.strokeStyle = 'rgba(0,240,255,0.35)';
-                    ctx.lineWidth = 1;
-                    ctx.stroke();
-                }
-
-                ctx.beginPath();
-                ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0,240,255,${alpha})`;
-                ctx.fill();
-            });
-
-            requestAnimationFrame(draw);
-        })();
-    }
 
     setTimeout(() => { document.body.style.opacity = '1'; }, 100);
 });
