@@ -989,6 +989,7 @@ a {
 .tag-cloud.revealed .tag:nth-child(18) { transition-delay: 850ms; }
 .tag-cloud.revealed .tag:nth-child(19) { transition-delay: 900ms; }
 .tag-cloud.revealed .tag:nth-child(20) { transition-delay: 950ms; }
+.tag-cloud.revealed .tag:nth-child(21) { transition-delay: 1000ms; }
 
 /* --- Stats Section --- */
 .stats-section {
