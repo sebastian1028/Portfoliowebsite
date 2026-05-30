@@ -1,46 +1,89 @@
 /**
- * SEBASTIAN CABALLERO - PORTFOLIO INTERACTIVITY
- * 2026 Premium Edition
+ * SEBASTIAN CABALLERO — PORTFOLIO
+ * 2026 WOW Edition
  */
 
 document.addEventListener('DOMContentLoaded', () => {
 
     // =============================================
-    // 1. INTERSECTION OBSERVER — Scroll Reveal
+    // 0. PRELOADER
     // =============================================
-    const revealObserver = new IntersectionObserver((entries, observer) => {
+    const preloader = document.getElementById('preloader');
+
+    function revealSite() {
+        if (!preloader || preloader.classList.contains('done')) return;
+        preloader.classList.add('done');
+        document.body.classList.remove('preloading');
+    }
+
+    // Primary timer: 2s (preloader animation lasts ~2s)
+    setTimeout(revealSite, 2000);
+    // Safety net on full load
+    window.addEventListener('load', () => setTimeout(revealSite, 200));
+
+    // =============================================
+    // 1. OBSERVERS — started AFTER preloader
+    //    so animations don't fire behind the loader
+    // =============================================
+    const revealObserver = new IntersectionObserver((entries, obs) => {
         entries.forEach(entry => {
             if (!entry.isIntersecting) return;
             entry.target.classList.add('active');
-            observer.unobserve(entry.target);
+            obs.unobserve(entry.target);
         });
     }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
 
-    document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
-
-    // Staggered reveal for bento cards
-    const bentoGrid = document.querySelector('.bento-grid');
-    if (bentoGrid) {
-        bentoGrid.classList.remove('scroll-reveal');
-        bentoGrid.querySelectorAll('.bento-card').forEach((card, i) => {
-            card.classList.add('scroll-reveal-stagger');
-            card.style.setProperty('--reveal-delay', `${i * 115}ms`);
-            revealObserver.observe(card);
+    const tagObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            entry.target.classList.add('revealed');
+            obs.unobserve(entry.target);
         });
-    }
+    }, { threshold: 0.2 });
 
-    // Tag cloud pop-in
-    const tagCloud = document.querySelector('.tag-cloud');
-    if (tagCloud) {
-        const tagObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                entry.target.classList.add('revealed');
-                observer.unobserve(entry.target);
+    const counterObserver = new IntersectionObserver((entries, obs) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const el = entry.target;
+            const target = parseInt(el.dataset.target, 10);
+            const start = performance.now();
+            const duration = 1800;
+
+            function update(now) {
+                const p = Math.min((now - start) / duration, 1);
+                const eased = 1 - Math.pow(1 - p, 3);
+                el.textContent = Math.floor(eased * target);
+                if (p < 1) requestAnimationFrame(update);
+                else el.textContent = target;
+            }
+            requestAnimationFrame(update);
+            obs.unobserve(el);
+        });
+    }, { threshold: 0.5 });
+
+    // Delay all observer activations until after preloader
+    setTimeout(() => {
+        document.querySelectorAll('.scroll-reveal').forEach(el => revealObserver.observe(el));
+
+        // Staggered bento cards
+        const bentoGrid = document.querySelector('.bento-grid');
+        if (bentoGrid) {
+            bentoGrid.classList.remove('scroll-reveal');
+            bentoGrid.querySelectorAll('.bento-card').forEach((card, i) => {
+                card.classList.add('scroll-reveal-stagger');
+                card.style.setProperty('--reveal-delay', `${i * 115}ms`);
+                revealObserver.observe(card);
             });
-        }, { threshold: 0.2 });
-        tagObserver.observe(tagCloud);
-    }
+        }
+
+        // Tag cloud
+        const tagCloud = document.querySelector('.tag-cloud');
+        if (tagCloud) tagObserver.observe(tagCloud);
+
+        // Counters
+        document.querySelectorAll('.counter').forEach(c => counterObserver.observe(c));
+
+    }, 2200);
 
     // =============================================
     // 2. SMOOTH SCROLLING
@@ -56,70 +99,27 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =============================================
-    // 3. HEADER + SCROLL PROGRESS
+    // 3. HEADER + SCROLL PROGRESS BAR
     // =============================================
-    const header = document.querySelector('.header');
+    const header      = document.querySelector('.header');
     const progressBar = document.getElementById('scrollProgress');
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header.style.background = 'rgba(5, 5, 7, 0.92)';
-            header.style.boxShadow = '0 4px 30px rgba(0,0,0,0.5)';
+            header.style.background = 'rgba(5,5,7,0.92)';
+            header.style.boxShadow  = '0 4px 30px rgba(0,0,0,0.5)';
         } else {
-            header.style.background = 'rgba(5, 5, 7, 0.7)';
-            header.style.boxShadow = 'none';
+            header.style.background = 'rgba(5,5,7,0.7)';
+            header.style.boxShadow  = 'none';
         }
-
         if (progressBar) {
-            const scrolled = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
-            progressBar.style.width = (scrolled * 100) + '%';
+            const pct = window.scrollY / (document.documentElement.scrollHeight - window.innerHeight);
+            progressBar.style.width = (pct * 100) + '%';
         }
     }, { passive: true });
 
     // =============================================
-    // 4. CUSTOM CURSOR
-    // =============================================
-    const cursorDot  = document.getElementById('cursorDot');
-    const cursorRing = document.getElementById('cursorRing');
-
-    if (cursorDot && cursorRing && window.matchMedia('(hover: hover)').matches) {
-        document.body.classList.add('custom-cursor-active');
-
-        let mouseX = -200, mouseY = -200;
-        let ringX  = -200, ringY  = -200;
-
-        // Dot follows exactly
-        document.addEventListener('mousemove', e => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            cursorDot.style.left = mouseX + 'px';
-            cursorDot.style.top  = mouseY + 'px';
-        });
-
-        // Ring follows with lerp lag
-        (function lerpRing() {
-            ringX += (mouseX - ringX) * 0.1;
-            ringY += (mouseY - ringY) * 0.1;
-            cursorRing.style.left = ringX + 'px';
-            cursorRing.style.top  = ringY + 'px';
-            requestAnimationFrame(lerpRing);
-        })();
-
-        // Hover state on interactive elements
-        document.querySelectorAll('a, button, .tag, .bento-card, .cert-card, .stat-card').forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorDot.classList.add('is-hovering');
-                cursorRing.classList.add('is-hovering');
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorDot.classList.remove('is-hovering');
-                cursorRing.classList.remove('is-hovering');
-            });
-        });
-    }
-
-    // =============================================
-    // 5. TYPEWRITER on Hero Badge
+    // 4. TYPEWRITER on Hero Badge (after preloader)
     // =============================================
     const badge = document.querySelector('.badge');
     if (badge) {
@@ -134,35 +134,24 @@ document.addEventListener('DOMContentLoaded', () => {
         badge.classList.add('typewriter-cursor');
 
         let rIdx = 0, cIdx = 0, deleting = false;
-
         function typeBadge() {
             const word = roles[rIdx];
             if (!deleting) {
                 badge.textContent = word.slice(0, cIdx + 1);
                 cIdx++;
-                if (cIdx === word.length) {
-                    deleting = true;
-                    setTimeout(typeBadge, 2400);
-                    return;
-                }
+                if (cIdx === word.length) { deleting = true; setTimeout(typeBadge, 2400); return; }
             } else {
                 badge.textContent = word.slice(0, cIdx - 1);
                 cIdx--;
-                if (cIdx === 0) {
-                    deleting = false;
-                    rIdx = (rIdx + 1) % roles.length;
-                    setTimeout(typeBadge, 420);
-                    return;
-                }
+                if (cIdx === 0) { deleting = false; rIdx = (rIdx + 1) % roles.length; setTimeout(typeBadge, 420); return; }
             }
             setTimeout(typeBadge, deleting ? 38 : 68);
         }
-
-        setTimeout(typeBadge, 900);
+        setTimeout(typeBadge, 2600);
     }
 
     // =============================================
-    // 6. 3D TILT on Bento & Cert Cards
+    // 5. 3D TILT on Cards
     // =============================================
     document.querySelectorAll('.bento-card, .cert-card').forEach(card => {
         card.addEventListener('mousemove', e => {
@@ -172,7 +161,6 @@ document.addEventListener('DOMContentLoaded', () => {
             card.style.transition = 'transform 0.12s ease-out, border-color 0.3s ease';
             card.style.transform  = `perspective(700px) rotateX(${-y * 10}deg) rotateY(${x * 10}deg) translateZ(14px)`;
         });
-
         card.addEventListener('mouseleave', () => {
             card.style.transition = 'transform 0.55s ease-out, border-color 0.3s ease';
             card.style.transform  = '';
@@ -180,7 +168,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     // =============================================
-    // 7. MAGNETIC BUTTON
+    // 6. MAGNETIC BUTTON
     // =============================================
     document.querySelectorAll('.btn-primary').forEach(btn => {
         btn.addEventListener('mousemove', e => {
@@ -189,8 +177,21 @@ document.addEventListener('DOMContentLoaded', () => {
             const y = (e.clientY - rect.top  - rect.height / 2) * 0.28;
             btn.style.transform = `translateY(-2px) translate(${x}px, ${y}px)`;
         });
-        btn.addEventListener('mouseleave', () => {
-            btn.style.transform = '';
+        btn.addEventListener('mouseleave', () => { btn.style.transform = ''; });
+    });
+
+    // =============================================
+    // 7. BUTTON CLICK RIPPLE
+    // =============================================
+    document.querySelectorAll('.btn-primary, .btn-secondary').forEach(btn => {
+        btn.addEventListener('click', e => {
+            const rect = btn.getBoundingClientRect();
+            const size = Math.max(rect.width, rect.height) * 2.2;
+            const ripple = document.createElement('span');
+            ripple.className = 'ripple-effect';
+            ripple.style.cssText = `width:${size}px;height:${size}px;left:${e.clientX - rect.left - size / 2}px;top:${e.clientY - rect.top - size / 2}px`;
+            btn.appendChild(ripple);
+            setTimeout(() => ripple.remove(), 700);
         });
     });
 
@@ -237,8 +238,8 @@ document.addEventListener('DOMContentLoaded', () => {
         function drawConnections() {
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
-                    const dx   = particles[i].x - particles[j].x;
-                    const dy   = particles[i].y - particles[j].y;
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
                     if (dist < 115) {
                         ctx.beginPath();
@@ -273,49 +274,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // =============================================
-    // 10. GLOW BACKGROUNDS FOLLOW MOUSE
+    // 10. NAV LOGO GLITCH
     // =============================================
-    const glow1 = document.querySelector('.glow-1');
-    const glow2 = document.querySelector('.glow-2');
-    if (glow1 && glow2) {
-        document.addEventListener('mousemove', e => {
-            const mx = e.clientX / window.innerWidth;
-            const my = e.clientY / window.innerHeight;
-            glow1.style.transform = `translate(${mx * 35}px, ${my * 25}px)`;
-            glow2.style.transform = `translate(${-mx * 25}px, ${-my * 18}px)`;
-        });
-    }
+    const logoEl = document.querySelector('.logo');
+    if (logoEl) {
+        logoEl.setAttribute('data-text', logoEl.textContent.trim());
 
-    // =============================================
-    // 11. ANIMATED COUNTERS
-    // =============================================
-    const counters = document.querySelectorAll('.counter');
-    if (counters.length > 0) {
-        const counterObserver = new IntersectionObserver((entries, observer) => {
-            entries.forEach(entry => {
-                if (!entry.isIntersecting) return;
-                const el     = entry.target;
-                const target = parseInt(el.dataset.target, 10);
-                const duration = 1800;
-                const start    = performance.now();
-
-                function update(now) {
-                    const progress = Math.min((now - start) / duration, 1);
-                    // Ease out cubic
-                    const eased = 1 - Math.pow(1 - progress, 3);
-                    el.textContent = Math.floor(eased * target);
-                    if (progress < 1) {
-                        requestAnimationFrame(update);
-                    } else {
-                        el.textContent = target;
-                    }
-                }
-                requestAnimationFrame(update);
-                observer.unobserve(el);
-            });
-        }, { threshold: 0.5 });
-
-        counters.forEach(c => counterObserver.observe(c));
+        (function scheduleGlitch() {
+            const delay = 5000 + Math.random() * 9000;
+            setTimeout(() => {
+                logoEl.classList.add('glitching');
+                setTimeout(() => logoEl.classList.remove('glitching'), 400);
+                scheduleGlitch();
+            }, delay);
+        })();
     }
 
     setTimeout(() => { document.body.style.opacity = '1'; }, 100);
