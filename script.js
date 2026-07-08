@@ -107,10 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header.style.background = 'rgba(5,5,7,0.92)';
+            header.style.background = 'rgba(0,0,0,0.92)';
             header.style.boxShadow  = '0 4px 30px rgba(0,0,0,0.5)';
         } else {
-            header.style.background = 'rgba(5,5,7,0.7)';
+            header.style.background = 'rgba(0,0,0,0.7)';
             header.style.boxShadow  = 'none';
         }
         if (progressBar) {
@@ -229,7 +229,7 @@ document.addEventListener('DOMContentLoaded', () => {
             draw() {
                 ctx.beginPath();
                 ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(0,240,255,${this.a})`;
+                ctx.fillStyle = `rgba(11,168,225,${this.a})`;
                 ctx.fill();
             }
         }
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(0,240,255,${0.13 * (1 - dist / 115)})`;
+                        ctx.strokeStyle = `rgba(11,168,225,${0.13 * (1 - dist / 115)})`;
                         ctx.lineWidth   = 0.5;
                         ctx.stroke();
                     }
