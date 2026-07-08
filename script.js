@@ -6,6 +6,26 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =============================================
+    // -1. THEME TOGGLE (light / dark)
+    // =============================================
+    function isLightTheme() {
+        return document.documentElement.getAttribute('data-theme') === 'light';
+    }
+
+    const themeToggle = document.getElementById('themeToggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+            const next = isLightTheme() ? 'dark' : 'light';
+            if (next === 'light') {
+                document.documentElement.setAttribute('data-theme', 'light');
+            } else {
+                document.documentElement.removeAttribute('data-theme');
+            }
+            localStorage.setItem('theme', next);
+        });
+    }
+
+    // =============================================
     // 0. PRELOADER
     // =============================================
     const preloader = document.getElementById('preloader');
@@ -39,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
             entry.target.classList.add('revealed');
             obs.unobserve(entry.target);
             // Init constellation after tags finish their pop-in animation
+            setTimeout(initConstellation, 1300);
         });
     }, { threshold: 0.2 });
 
@@ -104,13 +125,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // =============================================
     const header      = document.querySelector('.header');
     const progressBar = document.getElementById('scrollProgress');
+    const rootStyle   = getComputedStyle(document.documentElement);
 
     window.addEventListener('scroll', () => {
         if (window.scrollY > 50) {
-            header.style.background = 'rgba(0,0,0,0.92)';
-            header.style.boxShadow  = '0 4px 30px rgba(0,0,0,0.5)';
+            header.style.background = rootStyle.getPropertyValue('--header-bg-scrolled');
+            header.style.boxShadow  = rootStyle.getPropertyValue('--header-shadow-scrolled');
         } else {
-            header.style.background = 'rgba(0,0,0,0.7)';
+            header.style.background = rootStyle.getPropertyValue('--header-bg');
             header.style.boxShadow  = 'none';
         }
         if (progressBar) {
@@ -118,6 +140,100 @@ document.addEventListener('DOMContentLoaded', () => {
             progressBar.style.width = (pct * 100) + '%';
         }
     }, { passive: true });
+
+    // =============================================
+    // 3b. CUSTOM CURSOR (dot + trailing ring)
+    // =============================================
+    const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches
+        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (canUseCustomCursor) {
+        const cursorDot  = document.createElement('div');
+        const cursorRing = document.createElement('div');
+        cursorDot.className  = 'cursor-dot';
+        cursorRing.className = 'cursor-ring';
+        document.body.appendChild(cursorDot);
+        document.body.appendChild(cursorRing);
+        document.documentElement.classList.add('custom-cursor-active');
+
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let ringX  = mouseX, ringY = mouseY;
+
+        window.addEventListener('mousemove', e => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+            cursorDot.style.left = mouseX + 'px';
+            cursorDot.style.top  = mouseY + 'px';
+        }, { passive: true });
+
+        (function animateRing() {
+            ringX += (mouseX - ringX) * 0.18;
+            ringY += (mouseY - ringY) * 0.18;
+            cursorRing.style.left = ringX + 'px';
+            cursorRing.style.top  = ringY + 'px';
+            requestAnimationFrame(animateRing);
+        })();
+
+        const hoverTargets = 'a, button, .btn-primary, .btn-secondary, .bento-card, .cert-card, .tag';
+        document.addEventListener('mouseover', e => {
+            if (e.target.closest(hoverTargets)) {
+                cursorDot.classList.add('is-hovering');
+                cursorRing.classList.add('is-hovering');
+            }
+        });
+        document.addEventListener('mouseout', e => {
+            if (e.target.closest(hoverTargets)) {
+                cursorDot.classList.remove('is-hovering');
+                cursorRing.classList.remove('is-hovering');
+            }
+        });
+    }
+
+    // =============================================
+    // 3c. MOBILE MENU (hamburger + full-screen overlay)
+    // =============================================
+    const menuToggle = document.getElementById('menuToggle');
+    const mobileMenu  = document.getElementById('mobileMenu');
+
+    if (menuToggle && mobileMenu) {
+        function openMenu() {
+            menuToggle.classList.add('active');
+            mobileMenu.classList.add('active');
+            menuToggle.setAttribute('aria-expanded', 'true');
+            mobileMenu.setAttribute('aria-hidden', 'false');
+            document.body.style.overflow = 'hidden';
+        }
+        function closeMenu() {
+            menuToggle.classList.remove('active');
+            mobileMenu.classList.remove('active');
+            menuToggle.setAttribute('aria-expanded', 'false');
+            mobileMenu.setAttribute('aria-hidden', 'true');
+            document.body.style.overflow = '';
+        }
+
+        menuToggle.addEventListener('click', () => {
+            if (mobileMenu.classList.contains('active')) closeMenu();
+            else openMenu();
+        });
+
+        // Close when a link inside the menu is clicked
+        mobileMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMenu));
+
+        // Close on Escape
+        document.addEventListener('keydown', e => {
+            if (e.key === 'Escape' && mobileMenu.classList.contains('active')) closeMenu();
+        });
+
+        // Close on click outside the nav content (on the overlay backdrop itself)
+        mobileMenu.addEventListener('click', e => {
+            if (e.target === mobileMenu) closeMenu();
+        });
+
+        // Safety: if the viewport grows past the mobile breakpoint while open, close it
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768 && mobileMenu.classList.contains('active')) closeMenu();
+        });
+    }
 
     // =============================================
     // 4. TYPEWRITER on Hero Badge (after preloader)
@@ -217,8 +333,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.y  = Math.random() * canvas.height;
                 this.vx = (Math.random() - 0.5) * 0.38;
                 this.vy = (Math.random() - 0.5) * 0.38;
-                this.r  = Math.random() * 1.4 + 0.4;
-                this.a  = Math.random() * 0.45 + 0.15;
+                this.rf = Math.random();
+                this.af = Math.random();
             }
             update() {
                 this.x += this.vx;
@@ -227,9 +343,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.y < 0 || this.y > canvas.height)  this.vy *= -1;
             }
             draw() {
+                const light = isLightTheme();
+                const r = light ? this.rf * 2.0 + 1.1 : this.rf * 1.4 + 0.4;
+                const a = light ? this.af * 0.45 + 0.45 : this.af * 0.45 + 0.15;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(11,168,225,${this.a})`;
+                ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = light ? `rgba(44,95,217,${a})` : `rgba(11,168,225,${a})`;
                 ctx.fill();
             }
         }
@@ -237,6 +356,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const particles = Array.from({ length: 75 }, () => new Particle());
 
         function drawConnections() {
+            const light = isLightTheme();
+            const color    = light ? '76,122,237' : '11,168,225';
+            const maxAlpha = light ? 0.32 : 0.13;
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
@@ -246,8 +368,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(11,168,225,${0.13 * (1 - dist / 115)})`;
-                        ctx.lineWidth   = 0.5;
+                        ctx.strokeStyle = `rgba(${color},${maxAlpha * (1 - dist / 115)})`;
+                        ctx.lineWidth   = light ? 0.8 : 0.5;
                         ctx.stroke();
                     }
                 }
@@ -292,6 +414,102 @@ document.addEventListener('DOMContentLoaded', () => {
         })();
     }
 
+
+    // =============================================
+    // 11. SKILL CONSTELLATION (Stack tags)
+    // =============================================
+    function initConstellation() {
+        const wrapper = document.getElementById('constellation-wrapper');
+        const canvas  = document.getElementById('constellation-canvas');
+        if (!wrapper || !canvas || canvas.dataset.init) return;
+        canvas.dataset.init = '1';
+
+        const ctx  = canvas.getContext('2d');
+        const tags = Array.from(document.querySelectorAll('.tag-cloud .tag'));
+        let positions = [];
+        let mouseX = -999, mouseY = -999;
+        let hoveredIdx = -1;
+
+        function setupCanvas() {
+            canvas.width  = wrapper.offsetWidth  + 48;
+            canvas.height = wrapper.offsetHeight + 48;
+        }
+        setupCanvas();
+
+        function updatePositions() {
+            const wRect = wrapper.getBoundingClientRect();
+            positions = tags.map(tag => {
+                const r = tag.getBoundingClientRect();
+                return {
+                    x: r.left + r.width  / 2 - wRect.left + 24,
+                    y: r.top  + r.height / 2 - wRect.top  + 24
+                };
+            });
+        }
+        updatePositions();
+
+        window.addEventListener('resize', () => { setupCanvas(); updatePositions(); });
+
+        wrapper.addEventListener('mousemove', e => {
+            const r = wrapper.getBoundingClientRect();
+            mouseX = e.clientX - r.left + 24;
+            mouseY = e.clientY - r.top  + 24;
+        });
+        wrapper.addEventListener('mouseleave', () => {
+            mouseX = -999; mouseY = -999;
+            tags.forEach(t => { t.style.borderColor = ''; t.style.boxShadow = ''; });
+        });
+
+        tags.forEach((tag, i) => {
+            tag.addEventListener('mouseenter', () => { hoveredIdx = i; });
+            tag.addEventListener('mouseleave', () => {
+                hoveredIdx = -1;
+                tag.style.borderColor = '';
+                tag.style.boxShadow   = '';
+            });
+        });
+
+        let t = 0;
+
+        (function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            t += 0.007;
+
+            // Mouse proximity glow on nearby tags
+            const highlighted = new Set();
+            if (mouseX > 0 && positions.length) {
+                positions.forEach((pos, i) => {
+                    const d = Math.hypot(pos.x - mouseX, pos.y - mouseY);
+                    if (d < 95) {
+                        highlighted.add(i);
+                        const s = 1 - d / 95;
+                        tags[i].style.borderColor = `rgba(76,122,237,${0.4 + s * 0.5})`;
+                        tags[i].style.boxShadow   = `0 0 ${14 * s}px rgba(11,168,225,${0.3 * s})`;
+                    } else if (hoveredIdx !== i) {
+                        tags[i].style.borderColor = '';
+                        tags[i].style.boxShadow   = '';
+                    }
+                });
+            }
+            if (hoveredIdx !== -1) highlighted.add(hoveredIdx);
+
+            // Node dots — skipped on highlighted tags, whose CSS border/shadow already marks them
+            const dotColor = isLightTheme() ? '44,95,217' : '11,168,225';
+            positions.forEach((pos, i) => {
+                if (highlighted.has(i)) return;
+                const pulse = (Math.sin(t + i * 0.85) + 1) / 2;
+                const r     = 1.9 + pulse * 0.8;
+                const alpha = 0.45 + pulse * 0.35;
+
+                ctx.beginPath();
+                ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${dotColor},${alpha})`;
+                ctx.fill();
+            });
+
+            requestAnimationFrame(draw);
+        })();
+    }
 
     setTimeout(() => { document.body.style.opacity = '1'; }, 100);
 });

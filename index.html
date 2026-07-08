@@ -12,12 +12,37 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@300;400;500;700;800&family=Montserrat:ital,wght@1,900&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css?v=2">
+    <link rel="stylesheet" href="style.css?v=8">
 
-    <!-- Open Graph Básico -->
-    <meta property="og:title" content="Sebastián Caballero | Junior Solutions Engineer">
-    <meta property="og:description" content="Especialista en IA, bases de datos y automatización avanzada (2026).">
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="icon" type="image/png" sizes="32x32" href="favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="favicon-16x16.png">
+    <link rel="shortcut icon" href="favicon.ico">
+    <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+    <script>
+        (function () {
+            var saved = localStorage.getItem('theme');
+            if (saved === 'light') document.documentElement.setAttribute('data-theme', 'light');
+        })();
+    </script>
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="Sebastián Caballero | Junior Solutions Engineer & AI Architect">
+    <meta property="og:description" content="Ingeniero TIC y Máster en IA especializado en automatización, bases de datos complejas, y arquitectura de software de alto rendimiento.">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="https://sebastian1028.github.io/Portfoliowebsite/">
+    <meta property="og:image" content="https://sebastian1028.github.io/Portfoliowebsite/Imagenes/og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:image:alt" content="Sebastián Caballero — Junior Solutions Engineer & AI Architect">
+    <meta property="og:locale" content="es_CO">
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="Sebastián Caballero | Junior Solutions Engineer & AI Architect">
+    <meta name="twitter:description" content="Ingeniero TIC y Máster en IA especializado en automatización, bases de datos complejas, y arquitectura de software de alto rendimiento.">
+    <meta name="twitter:image" content="https://sebastian1028.github.io/Portfoliowebsite/Imagenes/og-image.png">
 </head>
 
 <body class="preloading">
@@ -36,15 +61,36 @@
     <header class="header">
         <div class="container nav-wrapper">
             <div class="logo">SEBASTIAN CABALLERO</div>
-            <nav class="nav">
-                <a href="#home">Inicio</a>
-                <a href="#about">Sobre Mí</a>
-                <a href="#expertise">Especialización</a>
-                <a href="#services">Servicios</a>
-                <a href="#contact" class="btn-nav">Contactar</a>
-            </nav>
+            <div class="nav-actions">
+                <nav class="nav">
+                    <a href="#home">Inicio</a>
+                    <a href="#about">Sobre Mí</a>
+                    <a href="#expertise">Especialización</a>
+                    <a href="#services">Servicios</a>
+                    <a href="#contact" class="btn-nav">Contactar</a>
+                </nav>
+                <button class="theme-toggle" id="themeToggle" aria-label="Cambiar tema claro/oscuro" type="button">
+                    <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+                    <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"/></svg>
+                </button>
+                <button class="menu-toggle" id="menuToggle" aria-label="Abrir menú" aria-expanded="false" aria-controls="mobileMenu" type="button">
+                    <span class="menu-toggle-bar"></span>
+                    <span class="menu-toggle-bar"></span>
+                    <span class="menu-toggle-bar"></span>
+                </button>
+            </div>
         </div>
     </header>
+
+    <div class="mobile-menu" id="mobileMenu" aria-hidden="true">
+        <nav class="mobile-menu-nav">
+            <a href="#home">Inicio</a>
+            <a href="#about">Sobre Mí</a>
+            <a href="#expertise">Especialización</a>
+            <a href="#services">Servicios</a>
+            <a href="#contact" class="btn-primary">Contactar</a>
+        </nav>
+    </div>
 
     <main>
         <!-- 1. HERO SECTION -->
@@ -227,29 +273,33 @@
                     </div>
                     <div class="stack scroll-reveal delay-1">
                         <h2 class="section-title" id="stack">Ecosistema & <span class="text-gradient">Stack</span></h2>
-                        <div class="tag-cloud">
-                            <span class="tag">Python</span>
-                            <span class="tag">Node.js</span>
-                            <span class="tag">Machine Learning</span>
-                            <span class="tag">Deep Learning</span>
-                            <span class="tag">NLP</span>
-                            <span class="tag">Visión Artificial</span>
-                            <span class="tag">Aprendizaje Supervisado</span>
-                            <span class="tag">Aprendizaje No Supervisado</span>
-                            <span class="tag">Robótica</span>
-                            <span class="tag">Databricks</span>
-                            <span class="tag">Oracle SQL</span>
-                            <span class="tag">SQL Server</span>
-                            <span class="tag">PostgreSQL</span>
-                            <span class="tag">MySQL</span>
-                            <span class="tag">REST APIs</span>
-                            <span class="tag">n8n</span>
-                            <span class="tag">Docker</span>
-                            <span class="tag">React / Next.js</span>
-                            <span class="tag">Power BI</span>
-                            <span class="tag">HTML / CSS</span>
-                            <span class="tag">Multimedia & Ed. Video</span>
+                        <div id="constellation-wrapper">
+                            <canvas id="constellation-canvas"></canvas>
+                            <div class="tag-cloud">
+                                <span class="tag tag-hero">Python</span>
+                                <span class="tag">Node.js</span>
+                                <span class="tag tag-hero">Machine Learning</span>
+                                <span class="tag tag-hero">Deep Learning</span>
+                                <span class="tag">NLP</span>
+                                <span class="tag">Visión Artificial</span>
+                                <span class="tag">Aprendizaje Supervisado</span>
+                                <span class="tag">Aprendizaje No Supervisado</span>
+                                <span class="tag">Robótica</span>
+                                <span class="tag">Databricks</span>
+                                <span class="tag">Oracle SQL</span>
+                                <span class="tag">SQL Server</span>
+                                <span class="tag">PostgreSQL</span>
+                                <span class="tag">MySQL</span>
+                                <span class="tag">REST APIs</span>
+                                <span class="tag">n8n</span>
+                                <span class="tag">Docker</span>
+                                <span class="tag">React / Next.js</span>
+                                <span class="tag">Power BI</span>
+                                <span class="tag">HTML / CSS</span>
+                                <span class="tag">Multimedia & Ed. Video</span>
+                            </div>
                         </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -263,6 +313,7 @@
                         <div class="cert-icon"
                             style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 12px; height: 120px;">
                             <img src="Imagenes/logo-uniandes.png" alt="Universidad de los Andes"
+                                loading="lazy" decoding="async"
                                 style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         </div>
                         <h4>Máster en Inteligencia Artificial</h4>
@@ -274,6 +325,7 @@
                         <div class="cert-icon"
                             style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 12px; height: 120px;">
                             <img src="Imagenes/UNIVERSIDAD-LIBRE.png" alt="Universidad Libre"
+                                loading="lazy" decoding="async"
                                 style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         </div>
                         <h4>Ingeniero en TIC</h4>
@@ -285,6 +337,7 @@
                         <div class="cert-icon"
                             style="margin-bottom: 1.5rem; display: flex; align-items: center; justify-content: center; background: rgba(255,255,255,0.95); padding: 15px; border-radius: 12px; height: 120px;">
                             <img src="Imagenes/Coursera-Logo.png" alt="Coursera"
+                                loading="lazy" decoding="async"
                                 style="max-height: 100%; max-width: 100%; object-fit: contain;">
                         </div>
                         <h4>Certificaciones Coursera</h4>
@@ -296,51 +349,30 @@
             </div>
         </section>
 
-        <!-- 8. DIFERENCIAL -->
-        <section class="differential" id="differential">
-            <div class="container scroll-reveal">
-                <div class="diff-box line-glow">
-                    <div class="diff-text">
-                        <h2>El Puente entre <span class="text-gradient">Negocio y Bits</span></h2>
-                        <p>La diferencia entre un desarrollador convencional y un ingeniero de soluciones radica
-                            esencialmente en el <strong>"por qué"</strong> de cada construcción.</p>
-                        <p>Cada línea de código que escribo, cada tabla en la arquitectura de base de datos que planeo y
-                            cada micro-flujo automatizado que diseño, se ata de forma irrevocable a un KPI de negocio.
-                            Entiendo cómo hablan los directivos para diagnosticar la necesidad, y poseo la estructura
-                            técnica rigurosa pertinente para traducirlo en una obra de ingeniería duradera, escalable y
-                            valiosa.</p>
-                    </div>
-                    <div class="diff-image">
-                        <img src="Imagenes/Imagen2.png" alt="Diferencial y Visión">
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <!-- 9. CLIENTES / EMPRESAS -->
         <section class="clients-section" id="clients">
             <div class="container">
                 <h2 class="section-title text-center scroll-reveal">Empresas con las que he <span class="text-gradient">colaborado</span></h2>
                 <div class="clients-carousel scroll-reveal">
                     <div class="clients-track">
-                        <img src="Imagenes/logo-ALCALDIA-DE-SAN-JOSE-DE-CUCUTA-NEGRO.png" alt="Alcaldía de San José de Cúcuta" class="logo-alcaldia">
-                        <img src="Imagenes/INDUCARBONES.png" alt="Inducarbones" class="logo-inducarbones">
-                        <img src="Imagenes/J&amp;C DENTAL GROUP.png" alt="J&C Dental Group" class="logo-jc">
-                        <img src="Imagenes/mintic.png" alt="MinTIC">
-                        <img src="Imagenes/Nelumbo.png" alt="Nelumbo">
-                        <img src="Imagenes/Mangus.png" alt="Mangus">
-                        <img src="Imagenes/elsazondeyamile.png" alt="Elsa Sazón de Yamile">
-                        <img src="Imagenes/ANDIAMO.png?v=2" alt="Andiamo">
-                        <img src="Imagenes/ensaladasaludables.png" alt="Ensalada Saludables">
-                        <img src="Imagenes/logo-ALCALDIA-DE-SAN-JOSE-DE-CUCUTA-NEGRO.png" alt="Alcaldía de San José de Cúcuta" class="logo-alcaldia">
-                        <img src="Imagenes/INDUCARBONES.png" alt="Inducarbones" class="logo-inducarbones">
-                        <img src="Imagenes/J&amp;C DENTAL GROUP.png" alt="J&C Dental Group" class="logo-jc">
-                        <img src="Imagenes/mintic.png" alt="MinTIC">
-                        <img src="Imagenes/Nelumbo.png" alt="Nelumbo">
-                        <img src="Imagenes/Mangus.png" alt="Mangus">
-                        <img src="Imagenes/elsazondeyamile.png" alt="Elsa Sazón de Yamile">
-                        <img src="Imagenes/ANDIAMO.png?v=2" alt="Andiamo">
-                        <img src="Imagenes/ensaladasaludables.png" alt="Ensalada Saludables">
+                        <img src="Imagenes/logo-ALCALDIA-DE-SAN-JOSE-DE-CUCUTA-NEGRO.png" alt="Alcaldía de San José de Cúcuta" class="logo-alcaldia" loading="lazy" decoding="async">
+                        <img src="Imagenes/INDUCARBONES.png" alt="Inducarbones" class="logo-inducarbones" loading="lazy" decoding="async">
+                        <img src="Imagenes/J&amp;C DENTAL GROUP.png" alt="J&C Dental Group" class="logo-jc" loading="lazy" decoding="async">
+                        <img src="Imagenes/mintic.png" alt="MinTIC" loading="lazy" decoding="async">
+                        <img src="Imagenes/Nelumbo.png" alt="Nelumbo" loading="lazy" decoding="async">
+                        <img src="Imagenes/Mangus.png" alt="Mangus" loading="lazy" decoding="async">
+                        <img src="Imagenes/elsazondeyamile.png" alt="Elsa Sazón de Yamile" loading="lazy" decoding="async">
+                        <img src="Imagenes/ANDIAMO.png?v=2" alt="Andiamo" loading="lazy" decoding="async">
+                        <img src="Imagenes/ensaladasaludables.png" alt="Ensalada Saludables" loading="lazy" decoding="async">
+                        <img src="Imagenes/logo-ALCALDIA-DE-SAN-JOSE-DE-CUCUTA-NEGRO.png" alt="Alcaldía de San José de Cúcuta" class="logo-alcaldia" loading="lazy" decoding="async">
+                        <img src="Imagenes/INDUCARBONES.png" alt="Inducarbones" class="logo-inducarbones" loading="lazy" decoding="async">
+                        <img src="Imagenes/J&amp;C DENTAL GROUP.png" alt="J&C Dental Group" class="logo-jc" loading="lazy" decoding="async">
+                        <img src="Imagenes/mintic.png" alt="MinTIC" loading="lazy" decoding="async">
+                        <img src="Imagenes/Nelumbo.png" alt="Nelumbo" loading="lazy" decoding="async">
+                        <img src="Imagenes/Mangus.png" alt="Mangus" loading="lazy" decoding="async">
+                        <img src="Imagenes/elsazondeyamile.png" alt="Elsa Sazón de Yamile" loading="lazy" decoding="async">
+                        <img src="Imagenes/ANDIAMO.png?v=2" alt="Andiamo" loading="lazy" decoding="async">
+                        <img src="Imagenes/ensaladasaludables.png" alt="Ensalada Saludables" loading="lazy" decoding="async">
                     </div>
                 </div>
             </div>
@@ -384,7 +416,7 @@
         </div>
     </footer>
 
-    <script src="script.js?v=2"></script>
+    <script src="script.js?v=7"></script>
 </body>
 
 </html>
