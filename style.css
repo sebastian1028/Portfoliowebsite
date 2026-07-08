@@ -80,14 +80,14 @@ a {
     font-weight: 700;
 }
 
-/* Glow Backgrounds */
+/* Glow Backgrounds — confined to hero so the rest of the page stays pure black */
 .glow-bg {
-    position: fixed;
+    position: absolute;
     border-radius: 50%;
     filter: blur(120px);
-    z-index: -1;
+    z-index: 0;
     pointer-events: none;
-    opacity: 0.65;
+    opacity: 0.6;
 }
 .glow-1 {
     top: -10%;
@@ -238,6 +238,8 @@ a {
 
 /* Hero Section */
 .hero {
+    position: relative;
+    overflow: hidden;
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -246,6 +248,8 @@ a {
 }
 
 .hero-grid {
+    position: relative;
+    z-index: 1;
     display: grid;
     grid-template-columns: 1.1fr 0.9fr;
     gap: 3rem;
