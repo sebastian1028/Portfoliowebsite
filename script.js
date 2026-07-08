@@ -6,26 +6,6 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     // =============================================
-    // -1. THEME TOGGLE (light / dark)
-    // =============================================
-    function isLightTheme() {
-        return document.documentElement.getAttribute('data-theme') === 'light';
-    }
-
-    const themeToggle = document.getElementById('themeToggle');
-    if (themeToggle) {
-        themeToggle.addEventListener('click', () => {
-            const next = isLightTheme() ? 'dark' : 'light';
-            if (next === 'light') {
-                document.documentElement.setAttribute('data-theme', 'light');
-            } else {
-                document.documentElement.removeAttribute('data-theme');
-            }
-            localStorage.setItem('theme', next);
-        });
-    }
-
-    // =============================================
     // 0. PRELOADER
     // =============================================
     const preloader = document.getElementById('preloader');
@@ -140,54 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
             progressBar.style.width = (pct * 100) + '%';
         }
     }, { passive: true });
-
-    // =============================================
-    // 3b. CUSTOM CURSOR (dot + trailing ring)
-    // =============================================
-    const canUseCustomCursor = window.matchMedia('(hover: hover) and (pointer: fine)').matches
-        && !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-    if (canUseCustomCursor) {
-        const cursorDot  = document.createElement('div');
-        const cursorRing = document.createElement('div');
-        cursorDot.className  = 'cursor-dot';
-        cursorRing.className = 'cursor-ring';
-        document.body.appendChild(cursorDot);
-        document.body.appendChild(cursorRing);
-        document.documentElement.classList.add('custom-cursor-active');
-
-        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
-        let ringX  = mouseX, ringY = mouseY;
-
-        window.addEventListener('mousemove', e => {
-            mouseX = e.clientX;
-            mouseY = e.clientY;
-            cursorDot.style.left = mouseX + 'px';
-            cursorDot.style.top  = mouseY + 'px';
-        }, { passive: true });
-
-        (function animateRing() {
-            ringX += (mouseX - ringX) * 0.18;
-            ringY += (mouseY - ringY) * 0.18;
-            cursorRing.style.left = ringX + 'px';
-            cursorRing.style.top  = ringY + 'px';
-            requestAnimationFrame(animateRing);
-        })();
-
-        const hoverTargets = 'a, button, .btn-primary, .btn-secondary, .bento-card, .cert-card, .tag';
-        document.addEventListener('mouseover', e => {
-            if (e.target.closest(hoverTargets)) {
-                cursorDot.classList.add('is-hovering');
-                cursorRing.classList.add('is-hovering');
-            }
-        });
-        document.addEventListener('mouseout', e => {
-            if (e.target.closest(hoverTargets)) {
-                cursorDot.classList.remove('is-hovering');
-                cursorRing.classList.remove('is-hovering');
-            }
-        });
-    }
 
     // =============================================
     // 3c. MOBILE MENU (hamburger + full-screen overlay)
@@ -333,8 +265,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 this.y  = Math.random() * canvas.height;
                 this.vx = (Math.random() - 0.5) * 0.38;
                 this.vy = (Math.random() - 0.5) * 0.38;
-                this.rf = Math.random();
-                this.af = Math.random();
+                this.r  = Math.random() * 2.0 + 1.1;
+                this.a  = Math.random() * 0.45 + 0.45;
             }
             update() {
                 this.x += this.vx;
@@ -343,12 +275,9 @@ document.addEventListener('DOMContentLoaded', () => {
                 if (this.y < 0 || this.y > canvas.height)  this.vy *= -1;
             }
             draw() {
-                const light = isLightTheme();
-                const r = light ? this.rf * 2.0 + 1.1 : this.rf * 1.4 + 0.4;
-                const a = light ? this.af * 0.45 + 0.45 : this.af * 0.45 + 0.15;
                 ctx.beginPath();
-                ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
-                ctx.fillStyle = light ? `rgba(44,95,217,${a})` : `rgba(11,168,225,${a})`;
+                ctx.arc(this.x, this.y, this.r, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(44,95,217,${this.a})`;
                 ctx.fill();
             }
         }
@@ -356,9 +285,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const particles = Array.from({ length: 75 }, () => new Particle());
 
         function drawConnections() {
-            const light = isLightTheme();
-            const color    = light ? '76,122,237' : '11,168,225';
-            const maxAlpha = light ? 0.32 : 0.13;
             for (let i = 0; i < particles.length; i++) {
                 for (let j = i + 1; j < particles.length; j++) {
                     const dx = particles[i].x - particles[j].x;
@@ -368,8 +294,8 @@ document.addEventListener('DOMContentLoaded', () => {
                         ctx.beginPath();
                         ctx.moveTo(particles[i].x, particles[i].y);
                         ctx.lineTo(particles[j].x, particles[j].y);
-                        ctx.strokeStyle = `rgba(${color},${maxAlpha * (1 - dist / 115)})`;
-                        ctx.lineWidth   = light ? 0.8 : 0.5;
+                        ctx.strokeStyle = `rgba(76,122,237,${0.32 * (1 - dist / 115)})`;
+                        ctx.lineWidth   = 0.8;
                         ctx.stroke();
                     }
                 }
@@ -494,7 +420,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (hoveredIdx !== -1) highlighted.add(hoveredIdx);
 
             // Node dots — skipped on highlighted tags, whose CSS border/shadow already marks them
-            const dotColor = isLightTheme() ? '44,95,217' : '11,168,225';
             positions.forEach((pos, i) => {
                 if (highlighted.has(i)) return;
                 const pulse = (Math.sin(t + i * 0.85) + 1) / 2;
@@ -503,7 +428,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 ctx.beginPath();
                 ctx.arc(pos.x, pos.y, r, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(${dotColor},${alpha})`;
+                ctx.fillStyle = `rgba(44,95,217,${alpha})`;
                 ctx.fill();
             });
 
