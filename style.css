@@ -379,11 +379,6 @@ a {
     background: rgba(11, 168, 225, 0.05);
 }
 
-.btn-large {
-    font-size: 1.1rem;
-    padding: 1.2rem 2.5rem;
-}
-
 /* Hero Section */
 .hero {
     position: relative;
@@ -1328,5 +1323,3 @@ a {
     transform: translateY(0);
     filter: blur(0);
 }
-
-/* --- Reduced motion overrides for new effects --- */

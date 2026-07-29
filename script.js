@@ -122,7 +122,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, { passive: true });
 
     // =============================================
-    // 3c. MOBILE MENU (hamburger + full-screen overlay)
+    // 3b. MOBILE MENU (hamburger + full-screen overlay)
     // =============================================
     const menuToggle = document.getElementById('menuToggle');
     const mobileMenu  = document.getElementById('mobileMenu');
@@ -322,7 +322,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-
     // =============================================
     // 10. NAV LOGO GLITCH
     // =============================================
@@ -339,7 +338,6 @@ document.addEventListener('DOMContentLoaded', () => {
             }, delay);
         })();
     }
-
 
     // =============================================
     // 11. SKILL CONSTELLATION (Stack tags)
