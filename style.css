@@ -980,6 +980,21 @@ a {
     .clients-track {
         gap: 1.5rem;
     }
+
+    .footer-content {
+        flex-direction: column;
+        gap: 1.5rem;
+        align-items: center;
+    }
+
+    .footer-logo {
+        padding: 0.4rem 1rem;
+    }
+
+    .footer-logo-text {
+        font-size: 0.85rem;
+        white-space: normal;
+    }
 }
 
 /* ============================================
